@@ -238,16 +238,24 @@ function delay(ms){return new Promise(r=>setTimeout(r,ms));}
 /* ══ JSONBIN ══ */
 async function fetchRecords(){
   try{
-    const r=await fetch(BIN_URL,{headers:{'X-Master-Key':BIN_KEY}});
+    const ctrl=new AbortController();
+    const tid=setTimeout(()=>ctrl.abort(),3000);
+    const r=await fetch(BIN_URL,{headers:{'X-Master-Key':BIN_KEY},signal:ctrl.signal});
+    clearTimeout(tid);
     const j=await r.json();
     globalRecords=j.record||{};
-  }catch(e){globalRecords={};}
+  }catch(e){globalRecords=globalRecords||{};}
 }
 async function saveRecord(key,s){
   const now=new Date();
   const d=now.toLocaleDateString('fr-FR')+' '+now.toLocaleTimeString('fr-FR');
   globalRecords[key]={score:s,pseudo,date:d};
-  try{await fetch(BIN_URL,{method:'PUT',headers:BIN_HEADERS,body:JSON.stringify(globalRecords)});}catch(e){}
+  try{
+    const ctrl=new AbortController();
+    const tid=setTimeout(()=>ctrl.abort(),4000);
+    await fetch(BIN_URL,{method:'PUT',headers:BIN_HEADERS,body:JSON.stringify(globalRecords),signal:ctrl.signal});
+    clearTimeout(tid);
+  }catch(e){}
 }
 
 /* ══ DÉCO SVG ══ */
@@ -313,6 +321,8 @@ function goToGame(){
   refreshBestDisplay();
   updateWorldRecord();
   document.getElementById('main-btn').disabled=false;
+  // Rafraîchit les records en arrière-plan sans bloquer
+  fetchRecords().then(()=>updateWorldRecord());
 }
 function goToHome(){
   playing=false;playerTurn=false;
@@ -591,15 +601,17 @@ async function handlePlayerRelease(colorId){
     const k=bestKey();
     const wr=globalRecords[k];
     if(!wr||newScore>wr.score){
-      // Nouveau record mondial !
       playNewRecord();
       setStatus('🏆 RECORD MONDIAL !','success');
-      await saveRecord(k,newScore);
+      // Mise à jour affichage immédiate, sauvegarde en arrière-plan
+      const now2=new Date();
+      const dateStr=now2.toLocaleDateString('fr-FR')+' '+now2.toLocaleTimeString('fr-FR');
+      globalRecords[k]={score:newScore,pseudo,date:dateStr};
       document.getElementById('wr-score').textContent=newScore;
       document.getElementById('wr-score').className='wr-score wr-new';
       document.getElementById('wr-pseudo').textContent=pseudo;
-      const now2=new Date();
-      document.getElementById('wr-date').textContent=now2.toLocaleDateString('fr-FR')+' '+now2.toLocaleTimeString('fr-FR');
+      document.getElementById('wr-date').textContent=dateStr;
+      saveRecord(k,newScore); // fire and forget
     } else {
       playSuccess();setStatus('BRAVO ! +1','success');
     }
