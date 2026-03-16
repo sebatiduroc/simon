@@ -394,14 +394,19 @@ function playTone(colorId,duration=300){
   }catch(e){}
 }
 function playError(){
-  try{
-    const ctx=getAudio(),osc=ctx.createOscillator(),gain=ctx.createGain();
-    osc.connect(gain);gain.connect(ctx.destination);
-    osc.type='sawtooth';osc.frequency.value=120;
-    gain.gain.setValueAtTime(0.3,ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.4);
-    osc.start(ctx.currentTime);osc.stop(ctx.currentTime+0.4);
-  }catch(e){}
+  [[130,0],[100,0.38],[75,0.76]].forEach(([f,t])=>{
+    try{
+      const ctx=getAudio(),osc=ctx.createOscillator(),gain=ctx.createGain();
+      osc.connect(gain);gain.connect(ctx.destination);
+      osc.type='sawtooth';
+      osc.frequency.setValueAtTime(f,ctx.currentTime+t);
+      osc.frequency.linearRampToValueAtTime(f*0.75,ctx.currentTime+t+0.32);
+      gain.gain.setValueAtTime(0,ctx.currentTime+t);
+      gain.gain.linearRampToValueAtTime(0.45,ctx.currentTime+t+0.04);
+      gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+t+0.35);
+      osc.start(ctx.currentTime+t);osc.stop(ctx.currentTime+t+0.36);
+    }catch(e){}
+  });
 }
 function playSuccess(){
   [523,659,784].forEach((f,i)=>{
@@ -531,7 +536,7 @@ async function playSequence(){
       litArc(fc,false);
     }
   }
-  await delay(250);playerTurn=true;step=0;
+  await delay(250);playerTurn=true;step=0;startThinkTimer();
   if(mode==='gm') setStatus('QUEL SON C\'ÉTAIT ?','warn');
   else if(mode==='insane') setStatus('IGNORE LES COULEURS !','insane');
   else setStatus('À TON TOUR...','success');
@@ -556,20 +561,34 @@ async function nextRound(){
   await delay(500);await playSequence();
 }
 
-let lastPress=0,pressColor=null;
+let lastPress=0,pressColor=null,thinkTimer=null;
+
+function clearThinkTimer(){
+  if(thinkTimer){clearTimeout(thinkTimer);thinkTimer=null;}
+}
+function startThinkTimer(){
+  clearThinkTimer();
+  thinkTimer=setTimeout(()=>{
+    if(playerTurn){playerTurn=false;gameOver(sequence[step]);}
+  },4000);
+}
+
 function handlePlayerPress(colorId){
   if(!playerTurn)return;
   const now=Date.now();if(now-lastPress<80)return;
   lastPress=now;pressColor=colorId;
+  clearThinkTimer();
   litArc(colorId,true);startTone(colorId);
 }
 async function handlePlayerRelease(colorId){
   if(colorId!==pressColor)return;
   pressColor=null;stopTone(colorId);litArc(colorId,false);
   if(!playerTurn)return;
-  if(colorId!==sequence[step]){await gameOver(sequence[step]);return;}
+  if(colorId!==sequence[step]){clearThinkTimer();await gameOver(sequence[step]);return;}
   step++;
+  if(step<sequence.length) startThinkTimer();
   if(step===sequence.length){
+    clearThinkTimer();
     playerTurn=false;
     const newScore=score+1;
     setScore(newScore);level++;
@@ -593,6 +612,7 @@ async function handlePlayerRelease(colorId){
 }
 
 async function gameOver(correctColor){
+  clearThinkTimer();
   playerTurn=false;playing=false;
   const revealMs=getSpeed()*0.75*3;
   if(correctColor){
