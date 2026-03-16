@@ -91,36 +91,33 @@
   .board-wrap svg{width:100%;height:100%;outline:none;}
   .score-panel{display:flex;gap:16px;align-items:center;justify-content:center;}
   .score-block{text-align:center;}
-  .score-label{font-size:8px;color:#6060a0;letter-spacing:2px;}
-  .score-val{font-family:'Orbitron',sans-serif;font-size:20px;font-weight:700;color:#fff;}
+  .score-label{font-size:10px;color:#6060a0;letter-spacing:2px;}
+  .score-val{font-family:'Orbitron',sans-serif;font-size:24px;font-weight:700;color:#fff;}
 
   /* Record mondial */
   .world-record{
     width:100%;max-width:280px;border:1px solid #1e1e3a;border-radius:8px;
     background:#0d0d20;padding:6px 10px;display:flex;flex-direction:column;gap:3px;
   }
-  .wr-title{font-size:9px;color:#7070a8;letter-spacing:2px;text-align:center;}
+  .wr-title{font-size:11px;color:#7070a8;letter-spacing:2px;text-align:center;}
   .wr-body{display:flex;justify-content:space-between;align-items:center;gap:6px;}
-  .wr-score{font-family:'Orbitron',sans-serif;font-size:18px;font-weight:700;color:#ffd60a;min-width:32px;}
-  .wr-pseudo{font-size:11px;color:#80b3ff;letter-spacing:1px;flex:1;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  .wr-date{font-size:10px;color:#6868a0;text-align:right;white-space:nowrap;}
+  .wr-score{font-family:'Orbitron',sans-serif;font-size:20px;font-weight:700;color:#ffd60a;min-width:32px;}
+  .wr-pseudo{font-size:13px;color:#80b3ff;letter-spacing:1px;flex:1;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .wr-date{font-size:11px;color:#6868a0;text-align:right;white-space:nowrap;}
   .wr-new{color:#5fff82 !important;animation:pulse .6s infinite alternate;}
 
   .speed-bar-wrap{width:100%;max-width:280px;}
-  .speed-label{font-size:8px;color:#6060a0;letter-spacing:2px;margin-bottom:3px;display:flex;justify-content:space-between;}
+  .speed-label{font-size:10px;color:#6060a0;letter-spacing:2px;margin-bottom:3px;display:flex;justify-content:space-between;}
   .speed-bar-bg{height:3px;background:#16163a;border-radius:2px;overflow:hidden;}
   .speed-bar{height:100%;background:linear-gradient(90deg,#3a86ff,#ff8500);border-radius:2px;transition:width .4s;width:0%;}
-  .status-text{font-size:11px;color:#6060a0;letter-spacing:2px;min-height:15px;text-align:center;}
+  .status-text{font-size:13px;color:#6060a0;letter-spacing:2px;min-height:17px;text-align:center;}
   .status-text.error{color:#ff6b7a;animation:shake .3s;}
   .status-text.success{color:#5fff82;}
   .status-text.warn{color:#ffd60a;}
   .status-text.insane{color:#ff4455;animation:pulse .6s infinite alternate;}
   @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
   @keyframes pulse{from{opacity:.6}to{opacity:1}}
-  .combo-badge{font-family:'Orbitron',sans-serif;font-size:8px;padding:3px 10px;border-radius:20px;background:#12121e;border:1px solid #333360;color:#6060a0;letter-spacing:1px;}
-  .combo-badge.active{border-color:#ffd60a;color:#ffe566;background:#1e1800;}
-  .combo-badge.insane{border-color:#ff4455;color:#ff8090;background:#1e0005;}
-  .action-btn{font-family:'Orbitron',sans-serif;font-size:12px;padding:10px 0;width:100%;max-width:280px;border-radius:8px;border:1.5px solid #3a86ff;background:#0d1a40;color:#80b3ff;cursor:pointer;letter-spacing:2px;transition:all .2s;outline:none;}
+  .action-btn{font-family:'Orbitron',sans-serif;font-size:13px;padding:11px 0;width:100%;max-width:280px;border-radius:8px;border:1.5px solid #3a86ff;background:#0d1a40;color:#80b3ff;cursor:pointer;letter-spacing:2px;transition:all .2s;outline:none;}
   .action-btn:hover{background:#1a2e60;border-color:#80b3ff;}
   .action-btn:disabled{opacity:.4;cursor:default;}
   .credit{font-size:9px;color:#333360;letter-spacing:1px;text-align:center;}
@@ -199,7 +196,6 @@
     <div class="speed-bar-bg"><div class="speed-bar" id="speed-bar"></div></div>
   </div>
   <div class="status-text" id="status">PRÊT !</div>
-  <div class="combo-badge" id="combo-badge">PALIER 1</div>
   <button class="action-btn" id="main-btn" onclick="startGame()">DÉMARRER</button>
   <div class="credit">Créé par Sébastien Dumortier</div>
 </div>
