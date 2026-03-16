@@ -431,7 +431,7 @@ async function nextRound(){
   playerTurn=false;
   const colors=COLORS.slice(0,diff);
   sequence.push(colors[Math.floor(Math.random()*diff)].id);
-  setStatus('REGARDE...','');updateSpeed();
+  setStatus(mode==='rookie' ? 'REGARDE...' : 'ÉCOUTE...','');updateSpeed();
   await delay(500);await playSequence();
 }
 
@@ -443,7 +443,7 @@ async function handlePlayerClick(colorId){
   lastClick=now;
   litArc(colorId,true);playTone(colorId,180);
   await delay(180);litArc(colorId,false);
-  if(colorId!==sequence[step]){await gameOver();return;}
+  if(colorId!==sequence[step]){await gameOver(sequence[step]);return;}
   step++;
   if(step===sequence.length){
     playerTurn=false;setScore(score+1);level++;
@@ -452,8 +452,18 @@ async function handlePlayerClick(colorId){
   }
 }
 
-async function gameOver(){
-  playerTurn=false;playing=false;playError();
+async function gameOver(correctColor){
+  playerTurn=false;playing=false;
+  // Joue et illumine la bonne touche 3x plus longtemps
+  const revealMs=getSpeed()*0.75*3;
+  if(correctColor){
+    litArc(correctColor,true);
+    playTone(correctColor,revealMs);
+    await delay(revealMs);
+    litArc(correctColor,false);
+    await delay(200);
+  }
+  playError();
   setStatus('PERDU ! Score: '+score,'error');
   await flashAll();
   document.getElementById('main-btn').disabled=false;
