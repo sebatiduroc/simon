@@ -142,6 +142,12 @@
     text-align:right;
   }
   .rec-empty{font-size:15px;color:#a0a8c8;text-align:center;padding:24px 0;}
+  .rec-mode-title{
+    font-family:'Orbitron','Rajdhani','Exo 2','Segoe UI',sans-serif;
+    font-size:15px;font-weight:700;color:#ffe566;
+    letter-spacing:2px;padding:16px 0 6px;
+    border-bottom:1px solid #2a2a50;margin-bottom:4px;
+  }
   .rec-ok-btn{
     font-family:'Orbitron','Rajdhani','Exo 2','Segoe UI',sans-serif;
     font-size:15px;padding:14px 0;width:100%;
@@ -609,30 +615,29 @@ const MODE_LABELS={rookie:'Rookie',gm:'Grand Maître',insane:'Insane'};
 const DIFF_LABELS={4:'4 couleurs',5:'5 couleurs',6:'6 couleurs'};
 
 function showRecords(){
-  const rows=[
-    ['rookie',4],['rookie',5],['rookie',6],
-    ['gm',4],['gm',5],['gm',6],
-    ['insane',4],['insane',5],['insane',6],
-  ];
-  const hasAny=rows.some(([m,d])=>globalRecords[m+'_'+d]&&globalRecords[m+'_'+d].score>0);
+  const modes=['rookie','gm','insane'];
+  const diffs=[4,5,6];
+  const hasAny=modes.some(m=>diffs.some(d=>globalRecords[m+'_'+d]&&globalRecords[m+'_'+d].score>0));
   let html='';
   if(!hasAny){
     html='<div class="rec-empty">Aucun record enregistré.<br>Sois le premier !</div>';
   } else {
-    html+='<table class="rec-table"><thead><tr>';
-    html+='<th>MODE</th><th>COULEURS</th><th>PSEUDO</th><th>SCORE</th>';
-    html+='</tr></thead><tbody>';
-    rows.forEach(([m,d])=>{
-      const rec=globalRecords[m+'_'+d];
-      if(!rec||!rec.score) return;
-      html+=`<tr>`;
-      html+=`<td class="rec-td-mode">${MODE_LABELS[m]}</td>`;
-      html+=`<td class="rec-td-diff">${DIFF_LABELS[d]}</td>`;
-      html+=`<td class="rec-td-pseudo">${rec.pseudo||'—'}</td>`;
-      html+=`<td class="rec-td-score">${rec.score}</td>`;
-      html+=`</tr>`;
+    modes.forEach(m=>{
+      const modeRows=diffs.map(d=>({d,rec:globalRecords[m+'_'+d]})).filter(({rec})=>rec&&rec.score>0);
+      if(!modeRows.length) return;
+      html+=`<div class="rec-mode-title">${MODE_LABELS[m]}</div>`;
+      html+=`<table class="rec-table"><thead><tr>`;
+      html+=`<th>COULEURS</th><th>PSEUDO</th><th>SCORE</th>`;
+      html+=`</tr></thead><tbody>`;
+      modeRows.forEach(({d,rec})=>{
+        html+=`<tr>`;
+        html+=`<td class="rec-td-diff">${DIFF_LABELS[d]}</td>`;
+        html+=`<td class="rec-td-pseudo">${rec.pseudo||'—'}</td>`;
+        html+=`<td class="rec-td-score">${rec.score}</td>`;
+        html+=`</tr>`;
+      });
+      html+=`</tbody></table>`;
     });
-    html+='</tbody></table>';
   }
   document.getElementById('records-body').innerHTML=html;
   document.getElementById('screen-records').classList.add('visible');
